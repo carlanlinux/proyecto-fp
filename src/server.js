@@ -111,9 +111,11 @@ app.get('*', (req, res) =>{
     res.sendFile(path.join(__dirname + '/build/index.html'));
 })
 
+/* Testeo de API
 app.get('/api/hola', (req, res) => res.send('Hola, la API funciona!'));
 
-app.get('/api/hola/:nombre', (req, res) => res.send(`Hola, ${req.params.nombre}, la API funciona!`));
+app.post('/api/hola/:nombre', (req, res) => res.send(`Hola, ${req.params.nombre}, la API funciona!`));
+*/
 
 app.listen(5000, () => console.log("Listening on port 5000"));
 
