@@ -107,9 +107,12 @@ app.post('/api/articles/:name/comentar', async (req, res) => {
 });*/
 
 //Aquí le decimos que lo que nos llegue de cualuqiera de las API REST pase por nuestra app
-app.get('*', (req, res) =>{
+/*app.get('*', (req, res) =>{
     res.sendFile(path.join(__dirname + '/build/index.html'));
-})
+})*/
+
+app.get('/api/hola', (req, res) => res.send('Hola, la API funciona!'));
+
 
 app.listen(5000, () => console.log("Listening on port 5000"));
 
