@@ -11,7 +11,7 @@ import * as path from "path";
 
 const app = express();
 
-//--> Indicar la ruta de despliegue de la  aplicación
+//--> Indicar la ruta de despliegue de la aplicación
 app.use(express.static(path.join(__dirname, 'build')));
 
 app.use(bodyParser.json());
