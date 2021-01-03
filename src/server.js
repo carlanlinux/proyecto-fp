@@ -6,7 +6,7 @@ import * as path from "path";
 //Levantar servidor le decimos que ejecute de nuevo el comando cuando detecte algún cambio:
 // npx nodemon --exec npx babel-node src/server.js
 // node start
-//Ejecutar mongo poner: mongo
+//Ejecutar mongo poner: mongod
 
 
 const app = express();
