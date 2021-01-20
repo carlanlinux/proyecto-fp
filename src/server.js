@@ -43,20 +43,20 @@ app.post("/hello", (req, res) => res.send(`Hello ${req.body.name}`));
 */
 
 //API endpoint para votar artículos, incluímos la palabra async
-app.post('/api/articles/:name/votar', async (req, res) => {
+app.post('/api/articulos/:name/votar', async (req, res) => {
     const articleName = req.params.name;
     withDB( async (db) => {
         //Sacamos los datos de la info del artículo que se pasa en la URL buscandolo en la colección pasándole el nombre
         // del artículo en objeto tal como está en la bd
-        const articleInfo = await db.collection('articles').findOne({name: articleName});
+        const articleInfo = await db.collection('articulos').findOne({nombre: articleName});
         //Hacemo sun update e la base de datos para sumarle 1 a los votos qeu tiene ese artículo
-        await db.collection('articles').updateOne({name: articleName}, {
+        await db.collection('articulos').updateOne({nombre: articleName}, {
             '$set': {
                 votos: articleInfo.votos + 1
             },
         });
         //Sacamos la información actuializada de la base de datos para mandarla en la respuesta
-        const updatedArticleInfo = await db.collection('articles').findOne({name: articleName});
+        const updatedArticleInfo = await db.collection('articulos').findOne({nombre: articleName});
         //Enviamos la respuesta en formato JSON con los datos actualizados.
         await res.status(200).json(updatedArticleInfo);
     }, res)
@@ -114,22 +114,22 @@ app.get('/api/articulo/:nombre', async (req, res) => {
 
 })
 
-app.post('/api/articles/:name/comentar', async (req, res) => {
+app.post('/api/articulos/:name/comentar', async (req, res) => {
     //Recogemos el valor del cuerpo de la request y lo asginamos el primero a la constante username y el segundo a text
-    const {username, text} = req.body;
+    const {usuario, comentario} = req.body;
     //Recogemos el nombre del artículo de la request, los parámetros y el nombre (:name)
     const articleName = req.params.name;
 
     withDB( async (db) => {
         //Vamos al array que tiene la info de los artículos, entramos en el índe que sea el nombre del artículo, nos vamos a los
         // comentarios y le hacemos un push al array un nuevo objeto que contenga nombre de usuario y el texto
-        const articleInfo = await db.collection('articles').findOne({name: articleName});
-        await db.collection('articles').updateOne({name : articleName}, {
+        const articleInfo = await db.collection('articulos').findOne({nombre: articleName});
+        await db.collection('articulos').updateOne({nombre : articleName}, {
             '$set' : {
-                comentarios: articleInfo.comentarios.concat({username, text}),
+                comentarios: articleInfo.comentarios.concat({usuario, comentario}),
             },
         });
-        const updatedArticleInfo = await db.collection('articles').findOne({name: articleName});
+        const updatedArticleInfo = await db.collection('articulos').findOne({nombre: articleName});
         //enviamos la respuesta si ha ido bien (status 200) con los comentarios del artículo en cuestión
         await res.status(200).json(updatedArticleInfo);
     }, res);
