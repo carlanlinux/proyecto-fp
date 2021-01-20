@@ -2,6 +2,7 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import {MongoClient} from 'mongodb';
 import * as path from "path";
+import crypto from "crypto";
 
 //Levantar servidor le decimos que ejecute de nuevo el comando cuando detecte algún cambio:
 // npx nodemon --exec npx babel-node src/server.js
@@ -148,7 +149,7 @@ app.post('/api/articulos/:name/comentar', async (req, res) => {
 });*/
 
 //Aquí le decimos que lo que nos llegue de cualuqiera de las API REST pase por nuestra app
-app.get('*', (req, res) =>{
+app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname + '/build/index.html'));
 })
 
@@ -157,6 +158,147 @@ app.get('/api/hola', (req, res) => res.send('Hola, la API funciona!'));
 
 app.post('/api/hola/:nombre', (req, res) => res.send(`Hola, ${req.params.nombre}, la API funciona!`));
 */
+
+/***** LOGIN Y GENERACION DE HASH *****/
+
+//Generar salt aleatoria, cogerá un número como parámetro que definirá el tamaño de la salt. Se le añade un validador par
+// que tenga que ser mayor que 15 para mejorar seguridad
+const generarSalt = rondas => {
+    if (rondas >= 15) {
+        throw new Error(`${rondas} is greater than 15,Must be less that 15`);
+    }
+    if (typeof rondas !== 'number') {
+        throw new Error('rounds param must be a number');
+    }
+    if (rondas == null) {
+        rondas = 12;
+    }
+    return crypto.randomBytes(Math.ceil(rondas / 2)).toString('hex').slice(0, rondas);
+};
+
+
+/*
+we’ll define our hashing algorithm to perform the hashing and salting logic. We’ll use the
+**crypto.createHmac(algorithm, key[, options])**, which creates and returns an Hmac object that uses the given algorithm
+and key. We’ll also use the sha512 algorithm. The second parameter will be the key, which is where we’ll pass in our salt.
+*/
+
+const hashear = (password, salt) => {
+    let hash = crypto.createHmac('sha512', salt);
+    hash.update(password);
+    let value = hash.digest('hex');
+    return {
+        salt: salt,
+        hashedpassword: value
+    };
+};
+
+/*
+we’ll write our hash function, which will call the hasher function. We’ll perform all our validations here, such as making
+ sure the salt is a string, a plain password is provided, and both password and salt are provided in the parameter.
+*/
+
+const hash = (password, salt) => {
+    if (password == null || salt == null) {
+        throw new Error('Must Provide Password and salt values');
+    }
+    if (typeof password !== 'string' || typeof salt !== 'string') {
+        throw new Error('password must be a string and salt must either be a salt string or a number of rounds');
+    }
+    return hashear(password, salt);
+};
+
+/*
+compare password function. This will actually use the same algorithm to hash the password entered and then test whether
+the new hash matches the stored hash.
+s in the inputted password and a hash as a parameter. For testing purposes, we’ll use the salt and hashed password that
+ we got to test the compare password function.
+
+We’ll write some validation to check whether the password or hash is provided and also whether the type of password is a
+ string and type of hash is an object, which contains the salt value and the hashed password.
+
+*/
+let comparar = (password, hash) => {
+
+    if (password == null || hash == null) {
+        throw new Error('password and hash is required to compare');
+    }
+    if (typeof password !== 'string' || typeof hash !== 'object') {
+        throw new Error('password must be a String and hash must be an Object');
+    }
+    let passwordData = hashear(password, hash.salt);
+    if (passwordData.hashedpassword === hash.hashedpassword) {
+        return true;
+    }
+    return false
+};
+
+/*module.exports = {
+    generateSalt,
+    hash,
+    compare
+}*/
+
+//API Endpoint para registrar nuevo usuario
+app.post('/api/nuevoUsuario', async (req, res) => {
+    let salt = generarSalt(10);
+    console.log(salt);
+    console.log(req.body.nombre);
+    console.log(req.body.email);
+    console.log(req.body.password);
+    withDB(async (db) => {
+        const user = {
+                nombreUsuario: req.body.nombre,
+                email: req.body.email,
+                password: await hash(req.body.password, salt), //
+                salt: (salt)
+            }
+        ;
+        //Buscamos en al base de datos el artículo que tenga ese nombre
+        console.log(user);
+        const respuesta = await db.collection('users').save(user);
+        //Le asignas el número del estado al constuir la respuesta.
+        await res.status(200).json({
+            status: "Success",
+            data: respuesta
+        });
+    }, res);
+
+});
+
+//ENDPOINT PARA LOGIN de usuario
+app.post('/api/login', async (req, res) => {
+
+    //Recogemos el valor del cuerpo de la request y lo asginamos el primero a la constante username y el segundo a text
+    const {email, password} = req.body;
+    console.log(email);
+    console.log(password);
+    //Recogemos el nombre del artículo de la request, los parámetros y el nombre (:name)
+
+    withDB(async (db) => {
+        //Buscarmos el usuario para ver si existe
+        const usuario = await db.collection('users').findOne({"email": email});
+
+        if (!usuario) {
+            return res.status(400).json({
+                type: "Usuario no encontrado",
+                msg: "Login incorrecto"
+            })
+        }
+        console.log(usuario);
+        let comprobarPass = await comparar(password, usuario.password);
+        if (comprobarPass) {
+            res.status(200).json({
+                status: "Exitoso",
+                message: "Login correcto",
+                data: usuario
+            })
+        }
+
+    }, res);
+
+});
+
 
 app.listen(5000, () => console.log("Listening on port 5000"));
 
