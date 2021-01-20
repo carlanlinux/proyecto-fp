@@ -293,6 +293,11 @@ app.post('/api/login', async (req, res) => {
                 message: "Login correcto",
                 data: usuario
             })
+        } else {
+            return res.status(400).json({
+                type: "Contraseña incorrecta",
+                msg: "Login incorrecto"
+            })
         }
 
     }, res);
