@@ -20,7 +20,12 @@ app.use(bodyParser.json());
 const withDB = async (operations, res) => {
     try {
         //Conectamos con la base de datos, hay que pasar siempre las opciones de newURLparser true
-        const client = await MongoClient.connect('mongodb://localhost:27017', {poolSize: 10, bufferMaxEntries: 0, reconnectTries: 5000, useNewUrlParser: true});
+        const client = await MongoClient.connect('mongodb://localhost:27017', {
+            poolSize: 10,
+            bufferMaxEntries: 0,
+            useNewUrlParser: true,
+            useUnifiedTopology: true
+        });
         //Creamos un objeto base de datos con el nombre de la base de datos que necesitamos
         const db = client.db('cms-blog');
 
