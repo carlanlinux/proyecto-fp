@@ -22,7 +22,7 @@ const withDB = async (operations, res) => {
         //Conectamos con la base de datos, hay que pasar siempre las opciones de newURLparser true
         const client = await MongoClient.connect('mongodb://localhost:27017', {poolSize: 10, bufferMaxEntries: 0, reconnectTries: 5000, useNewUrlParser: true});
         //Creamos un objeto base de datos con el nombre de la base de datos que necesitamos
-        const db = client.db('proyecto-fp');
+        const db = client.db('cms-blog');
 
         //Ejecutamos las operaciones que nos pasan por parámetros pasando la base de datos.
         await operations(db);
@@ -31,7 +31,7 @@ const withDB = async (operations, res) => {
         await client.close();
     } catch (e) {
         //Mandamos el mensaje de error
-        await res.status(500).json({message: "Error al conectar con la base de datos", e});
+        await res.status(500).json({message: "Error al conectar con la base de datos", e:e.toString()});
     }
 }
 
@@ -62,19 +62,55 @@ app.post('/api/articles/:name/votar', async (req, res) => {
     }, res)
 });
 
+//Rescatamos todos los artículos que tenemos en la colección
+app.get('/api/obtenerArticulos', async (req, res) => {
 
-app.get('/api/articles/:name', async (req, res) => {
+    //Llamamos a la función de la base de datos y tenemos como parámetro la propia base de datos y la operación que
+    // queremos realizar
+    await withDB(async (db) => {
+        const arrayAux = [];
+        //Buscamos en al base de datos el artículo que tenga ese nombre
+        let cursor = await db.collection('articulos').find();
+        while (await cursor.hasNext()) {
+            const articulo = await cursor.next();
+            arrayAux.push(articulo);
+        }
+
+        //Le asignas el número del estado al constuir la respuesta.
+        await res.status(200).json(arrayAux);
+    }, res);
+
+
+})
+
+
+//Rescatamos todos los artículos que tenemos en la colección
+app.get('/api/usuarios', async (req, res) => {
+
+    //Llamamos a la función de la base de datos y tenemos como parámetro la propia base de datos y la operación que
+    // queremos realizar
+    await withDB(async (db) => {
+        //Buscamos en al base de datos el artículo que tenga ese nombre
+        const infoArticulo = await db.collection('usuarios').find()
+        //Le asignas el número del estado al constuir la respuesta.
+        await res.status(200).json(infoArticulo);
+    }, res);
+
+
+})
+
+//Obtener artículo
+app.get('/api/articulo/:nombre', async (req, res) => {
 
     //Llamamos a la función de la base de datos y tenemos como parámetro la propia base de datos y la operación que
     // queremos realizar
     withDB(async (db) => {
-        const articleName = req.params.name;
+        const nombreArticulo = req.params.nombre;
         //Buscamos en al base de datos el artículo que tenga ese nombre
-        const articleInfo = await db.collection('articles').findOne({name: articleName});
+        const infoArticulo = await db.collection('articulos').findOne({nombre: nombreArticulo});
         //Le asignas el número del estado al constuir la respuesta.
-        await res.status(200).json(articleInfo);
+        await res.status(200).json(infoArticulo);
     }, res);
-
 
 })
 
