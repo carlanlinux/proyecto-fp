@@ -307,7 +307,7 @@ app.post('/api/borrarUsuario', async (req, res) => {
 
     withDB(async (db) => {
         //Buscarmos el usuario para ver si existe
-        const usuario = await db.collection('users').remove({"email": email});
+        const usuario = await db.collection('users').deleteOne({"email": email});
         if (!usuario) {
             return res.status(400).json({
                 type: "Error",
