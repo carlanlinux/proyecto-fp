@@ -11,11 +11,12 @@ import crypto from "crypto";
 
 
 const app = express();
+const cors = require('cors');
 
 //--> Indicar la ruta de despliegue de la aplicación
 app.use(express.static(path.join(__dirname, 'build')));
-
 app.use(bodyParser.json());
+app.use(cors());
 
 //Creamos una función que gestiona la conexión con la base de datos y le pasamos como parámetro las operaciones a realizar
 const withDB = async (operations, res) => {
@@ -89,21 +90,26 @@ app.get('/api/obtenerArticulos', async (req, res) => {
 
 })
 
-
-//Rescatamos todos los artículos que tenemos en la colección
-app.get('/api/usuarios', async (req, res) => {
+//Obtener todos los uausarios
+app.get('/api/obtenenerTodosUsuarios', async (req, res) => {
 
     //Llamamos a la función de la base de datos y tenemos como parámetro la propia base de datos y la operación que
     // queremos realizar
     await withDB(async (db) => {
-        //Buscamos en al base de datos el artículo que tenga ese nombre
-        const infoArticulo = await db.collection('usuarios').find()
+        const arrayAux = [];
+        //Buscamos en al base de datos los uaurios que tengan ese nombre
+        let cursor = await db.collection('users').find();
+        while (await cursor.hasNext()) {
+            const usuario = await cursor.next();
+            arrayAux.push(usuario);
+        }
+
         //Le asignas el número del estado al constuir la respuesta.
-        await res.status(200).json(infoArticulo);
+        await res.status(200).json(arrayAux);
     }, res);
 
-
 })
+
 
 //Obtener artículo
 app.get('/api/articulo/:nombre', async (req, res) => {
@@ -159,7 +165,7 @@ app.get('/api/hola', (req, res) => res.send('Hola, la API funciona!'));
 app.post('/api/hola/:nombre', (req, res) => res.send(`Hola, ${req.params.nombre}, la API funciona!`));
 */
 
-/***** LOGIN Y GENERACION DE HASH *****/
+/***** GESTION DE USUARIOS LOGIN Y GENERACION DE HASH *****/
 
 //Generar salt aleatoria, cogerá un número como parámetro que definirá el tamaño de la salt. Se le añade un validador par
 // que tenga que ser mayor que 15 para mejorar seguridad
@@ -218,7 +224,7 @@ We’ll write some validation to check whether the password or hash is provided 
  string and type of hash is an object, which contains the salt value and the hashed password.
 
 */
-let comparar = (password, hash) => {
+const comparar = (password, hash) => {
 
     if (password == null || hash == null) {
         throw new Error('password and hash is required to compare');
@@ -233,29 +239,20 @@ let comparar = (password, hash) => {
     return false
 };
 
-/*module.exports = {
-    generateSalt,
-    hash,
-    compare
-}*/
+
 
 //API Endpoint para registrar nuevo usuario
 app.post('/api/nuevoUsuario', async (req, res) => {
     let salt = generarSalt(10);
-    console.log(salt);
-    console.log(req.body.nombre);
-    console.log(req.body.email);
-    console.log(req.body.password);
+
     withDB(async (db) => {
         const user = {
                 nombreUsuario: req.body.nombre,
                 email: req.body.email,
-                password: await hash(req.body.password, salt), //
-                salt: (salt)
+                password: await hash(req.body.password, salt),
             }
         ;
         //Buscamos en al base de datos el artículo que tenga ese nombre
-        console.log(user);
         const respuesta = await db.collection('users').save(user);
         //Le asignas el número del estado al constuir la respuesta.
         await res.status(200).json({
@@ -266,13 +263,12 @@ app.post('/api/nuevoUsuario', async (req, res) => {
 
 });
 
+
 //ENDPOINT PARA LOGIN de usuario
 app.post('/api/login', async (req, res) => {
 
     //Recogemos el valor del cuerpo de la request y lo asginamos el primero a la constante username y el segundo a text
     const {email, password} = req.body;
-    console.log(email);
-    console.log(password);
     //Recogemos el nombre del artículo de la request, los parámetros y el nombre (:name)
 
     withDB(async (db) => {
@@ -285,21 +281,44 @@ app.post('/api/login', async (req, res) => {
                 msg: "Login incorrecto"
             })
         }
-        console.log(usuario);
+
         let comprobarPass = await comparar(password, usuario.password);
         if (comprobarPass) {
-            res.status(200).json({
-                status: "Exitoso",
-                message: "Login correcto",
-                data: usuario
-            })
+            res.status(200).json(usuario.nombreUsuario);
         } else {
-            return res.status(400).json({
+            return res.status(401).json({
                 type: "Contraseña incorrecta",
                 msg: "Login incorrecto"
             })
         }
 
+    }, res);
+
+});
+
+//ENDPOINT PARA LOGIN de usuario
+app.post('/api/borrarUsuario', async (req, res) => {
+
+    //Recogemos el valor del cuerpo de la request y lo asginamos el primero a la constante username y el segundo a text
+    console.log(req.body);
+    const {email} = req.body;
+    console.log(email)
+    //Recogemos el nombre del artículo de la request, los parámetros y el nombre (:name)
+
+    withDB(async (db) => {
+        //Buscarmos el usuario para ver si existe
+        const usuario = await db.collection('users').remove({"email": email});
+        if (!usuario) {
+            return res.status(400).json({
+                type: "Error",
+                msg: "Usuario no encontrado"
+            })
+        } else {
+            return res.status(200).json({
+                type: "Exito",
+                msg: "Usuario borrado correctamente"
+            })
+        }
     }, res);
 
 });
