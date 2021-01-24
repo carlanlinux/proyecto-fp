@@ -88,9 +88,9 @@ app.get('/api/obtenerArticulos', async (req, res) => {
     }, res);
 
 
-})
+});
 
-//Obtener todos los uausarios
+//API ENDPOINT OBTENER TODOS LOS USUARIOS
 app.get('/api/obtenenerTodosUsuarios', async (req, res) => {
 
     //Llamamos a la función de la base de datos y tenemos como parámetro la propia base de datos y la operación que
@@ -108,10 +108,10 @@ app.get('/api/obtenenerTodosUsuarios', async (req, res) => {
         await res.status(200).json(arrayAux);
     }, res);
 
-})
+});
 
 
-//Obtener artículo
+//API ENDPOINT Obtener artículo
 app.get('/api/articulo/:nombre', async (req, res) => {
 
     //Llamamos a la función de la base de datos y tenemos como parámetro la propia base de datos y la operación que
@@ -124,8 +124,9 @@ app.get('/api/articulo/:nombre', async (req, res) => {
         await res.status(200).json(infoArticulo);
     }, res);
 
-})
+});
 
+//API ENDPOINT COMENTAR ARTICULOS
 app.post('/api/articulos/:name/comentar', async (req, res) => {
     //Recogemos el valor del cuerpo de la request y lo asginamos el primero a la constante username y el segundo a text
     const {usuario, comentario} = req.body;
@@ -148,6 +149,31 @@ app.post('/api/articulos/:name/comentar', async (req, res) => {
 
 });
 
+//API ENDPOINT BORRAR POST
+app.post('/api/borrarPost', async (req, res) => {
+
+    //Recogemos el valor del cuerpo de la request y lo asginamos el primero a la constante username y el segundo a text
+    const {nombreArticulo} = req.body;
+    //Recogemos el nombre del artículo de la request, los parámetros y el nombre (:name)
+
+    withDB(async (db) => {
+        //Buscarmos el usuario para ver si existe
+        const articulo = await db.collection('articulos').deleteOne(nombreArticulo);
+        if (!articulo) {
+            return res.status(400).json({
+                type: "Error",
+                msg: "Artículo no encontrado"
+            })
+        } else {
+            return res.status(200).json({
+                type: "Exito",
+                msg: "Artículo borrado correctamente"
+            })
+        }
+    }, res)
+});
+
+
 /*app.use(function(req, res, next) {
     res.header("Access-Control-Allow-Origin", "*"); // update to match the domain you will make the request from
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
@@ -158,6 +184,8 @@ app.post('/api/articulos/:name/comentar', async (req, res) => {
 app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname + '/build/index.html'));
 })
+
+//ENDPOINT PARA BORRAR post
 
 /* Testeo de API
 app.get('/api/hola', (req, res) => res.send('Hola, la API funciona!'));
@@ -296,7 +324,7 @@ app.post('/api/login', async (req, res) => {
 
 });
 
-//ENDPOINT PARA LOGIN de usuario
+//ENDPOINT PARA BORRAR de usuario
 app.post('/api/borrarUsuario', async (req, res) => {
 
     //Recogemos el valor del cuerpo de la request y lo asginamos el primero a la constante username y el segundo a text
