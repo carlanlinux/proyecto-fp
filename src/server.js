@@ -138,7 +138,7 @@ app.post('/api/articulos/:name/comentar', async (req, res) => {
         // comentarios y le hacemos un push al array un nuevo objeto que contenga nombre de usuario y el texto
         const articleInfo = await db.collection('articulos').findOne({nombre: articleName});
         await db.collection('articulos').updateOne({nombre : articleName}, {
-            '$set' : {
+            '$set': {
                 comentarios: articleInfo.comentarios.concat({usuario, comentario}),
             },
         });
@@ -148,6 +148,33 @@ app.post('/api/articulos/:name/comentar', async (req, res) => {
     }, res);
 
 });
+
+
+app.post('/api/articulos/nuevoArticulo', async (req, res) => {
+    //Recogemos el valor del cuerpo de la request y lo asginamos el primero a la constante username y el segundo a text
+    const {nombre, texto, titulo, fechaCreacion, autor} = req.body;
+    //Recogemos el nombre del artículo de la request, los parámetros y el nombre (:name)
+    console.log(req.body);
+
+    withDB(async (db) => {
+        //Vamos al array que tiene la info de los artículos, entramos en el índe que sea el nombre del artículo, nos vamos a los
+        // comentarios y le hacemos un push al array un nuevo objeto que contenga nombre de usuario y el texto
+        await db.collection('articulos').insertOne({
+            nombre: nombre,
+            titulo: titulo,
+            texto: texto,
+            autor: autor,
+            fechaCreacion: fechaCreacion,
+            votos: 0,
+            comentarios: []
+        },);
+        const updatedArticleInfo = await db.collection('articulos').findOne({nombre: nombre});
+        //enviamos la respuesta si ha ido bien (status 200) con los comentarios del artículo en cuestión
+        await res.status(200).json(updatedArticleInfo);
+    }, res);
+
+});
+
 
 //API ENDPOINT BORRAR POST
 app.post('/api/borrarPost', async (req, res) => {
