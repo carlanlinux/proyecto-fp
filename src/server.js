@@ -207,10 +207,6 @@ app.post('/api/borrarPost', async (req, res) => {
     next();
 });*/
 
-//Aquí le decimos que lo que nos llegue de cualuqiera de las API REST pase por nuestra app
-app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname + '/build/index.html'));
-})
 
 //ENDPOINT PARA BORRAR post
 
