@@ -19,6 +19,7 @@
     "@babel/core": "^7.12.9",
     "@babel/node": "^7.12.6",
     "@babel/preset-env": "^7.12.7",
+    "cors": "^2.8.5",
     "nodemon": "^2.0.6"
   }
 }
