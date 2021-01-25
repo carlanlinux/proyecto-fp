@@ -1,8 +1,8 @@
 {
   "files": {
-    "main.css": "/static/css/main.664590fd.chunk.css",
-    "main.js": "/static/js/main.36cbdd2c.chunk.js",
-    "main.js.map": "/static/js/main.36cbdd2c.chunk.js.map",
+    "main.css": "/static/css/main.c37ef335.chunk.css",
+    "main.js": "/static/js/main.ab5794ad.chunk.js",
+    "main.js.map": "/static/js/main.ab5794ad.chunk.js.map",
     "runtime-main.js": "/static/js/runtime-main.8988b68f.js",
     "runtime-main.js.map": "/static/js/runtime-main.8988b68f.js.map",
     "static/css/2.dcb9beed.chunk.css": "/static/css/2.dcb9beed.chunk.css",
@@ -12,7 +12,7 @@
     "static/js/3.6a854d12.chunk.js.map": "/static/js/3.6a854d12.chunk.js.map",
     "index.html": "/index.html",
     "static/css/2.dcb9beed.chunk.css.map": "/static/css/2.dcb9beed.chunk.css.map",
-    "static/css/main.664590fd.chunk.css.map": "/static/css/main.664590fd.chunk.css.map",
+    "static/css/main.c37ef335.chunk.css.map": "/static/css/main.c37ef335.chunk.css.map",
     "static/js/2.014875e8.chunk.js.LICENSE.txt": "/static/js/2.014875e8.chunk.js.LICENSE.txt",
     "static/media/reactAnimado.9967cef2.gif": "/static/media/reactAnimado.9967cef2.gif"
   },
@@ -20,7 +20,7 @@
     "static/js/runtime-main.8988b68f.js",
     "static/css/2.dcb9beed.chunk.css",
     "static/js/2.014875e8.chunk.js",
-    "static/css/main.664590fd.chunk.css",
-    "static/js/main.36cbdd2c.chunk.js"
+    "static/css/main.c37ef335.chunk.css",
+    "static/js/main.ab5794ad.chunk.js"
   ]
 }
