@@ -86,6 +86,7 @@ app.get('/api/obtenerArticulos', async (req, res) => {
         //Le asignas el número del estado al constuir la respuesta.
         await res.status(200).json(arrayAux);
     }, res);
+});
 
 //Devolver los 5 artículos más recientes creados
     app.get('/api/obtenerArticulosReducido', async (req, res) => {
@@ -100,16 +101,10 @@ app.get('/api/obtenerArticulos', async (req, res) => {
                 const articulo = await cursor.next();
                 arrayAux.push(articulo);
             }
-
             //Le asignas el número del estado al constuir la respuesta.
             await res.status(200).json(arrayAux);
         }, res);
-
-
     });
-
-
-});
 
 
 //API ENDPOINT OBTENER TODOS LOS USUARIOS
