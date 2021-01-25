@@ -1,0 +1,14 @@
+{
+  "version": 3,
+  "sources": [
+    "webpack://src/index.css",
+    "webpack://src/App.css"
+  ],
+  "names": [],
+  "mappings": "AACA,KACE,eAAgB,CAChB,wBACF,CAEA,kBAEE,UACF,CAEA,OACE,cACF,CAEA,yBAEE,kCAAoC,CACpC,cACF,CCnBA,KACE,iBACF,CAEA,UACE,aAAc,CACd,mBACF,CAEA,gBACE,cAAe,CACf,wBAAiB,CAAjB,oBAAiB,CAAjB,gBACF,CAEA,8CACE,UACE,mDAA4C,CAA5C,2CACF,CACF,CAGA,4BACE,YACF",
+  "file": "main.664590fd.chunk.css",
+  "sourcesContent": [
+    "/**  Basic Page CSS **/\nbody {\n  font-weight: 200;\n  background-color: #337ab7;\n}\n\nheader a,\nfooter a {\n  color: white;\n}\n\nfooter {\n  font-size: 0.8em;\n}\n\n.bg-primary,\n.btn-primary {\n  background-color: #377bb5 !important;\n  border: inherit;\n}\n",
+    ".App {\n  text-align: center;\n}\n\n.App-logo {\n  height: 40vmin;\n  pointer-events: none;\n}\n\n.apt-addheading {\n  cursor: pointer;\n  user-select: none;\n}\n\n@media (prefers-reduced-motion: no-preference) {\n  .App-logo {\n    animation: App-logo-spin infinite 20s linear;\n  }\n}\n\n\n.add-appointment .card-body {\n  display: none;\n}\n\n"
+  ]
+}
