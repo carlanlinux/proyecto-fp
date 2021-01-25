@@ -394,6 +394,11 @@ app.post('/api/borrarUsuario', async (req, res) => {
 
 });
 
+//Hacemos que nos enrute cualquier petición que nos entre a la aplicación
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname + '/build/index.html'));
+})
+
 
 app.listen(5000, () => console.log("Listening on port 5000"));
 
