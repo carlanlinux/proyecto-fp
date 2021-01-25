@@ -112,28 +112,6 @@ app.get('/api/obtenerArticulos', async (req, res) => {
 });
 
 
-//Devolver los 5 artículos más recientes creados
-app.get('/api/obtenerArticulosReducido', async (req, res) => {
-
-    //Llamamos a la función de la base de datos y tenemos como parámetro la propia base de datos y la operación que
-    // queremos realizar
-    await withDB(async (db) => {
-        const arrayAux = [];
-        //Buscamos en al base de datos el artículo que tenga ese nombre
-        let cursor = await db.collection('articulos').find().limit(4).sort({fechaCreacion: -1});
-        while (await cursor.hasNext()) {
-            const articulo = await cursor.next();
-            arrayAux.push(articulo);
-        }
-
-        //Le asignas el número del estado al constuir la respuesta.
-        await res.status(200).json(arrayAux);
-    }, res);
-
-
-});
-
-
 //API ENDPOINT OBTENER TODOS LOS USUARIOS
 app.get('/api/obtenenerTodosUsuarios', async (req, res) => {
 
@@ -279,9 +257,11 @@ const generarSalt = rondas => {
 
 
 /*
-we’ll define our hashing algorithm to perform the hashing and salting logic. We’ll use the
-**crypto.createHmac(algorithm, key[, options])**, which creates and returns an Hmac object that uses the given algorithm
-and key. We’ll also use the sha512 algorithm. The second parameter will be the key, which is where we’ll pass in our salt.
+Hacemos un algorimo de hasheo que se encargue tanto del hasing como de la lógica para la salt. Para ello usamos:
+
+**crypto.createHmac(algorithm, key[, options])**, Crea y devuelve un objeto Hmac que lo usa al algortimo y la clave.
+Se usará también el  sha512 algorithm. El segurndo parametro será la clave, y será donde pasemos la salt
+
 */
 
 const hashear = (password, salt) => {
@@ -295,8 +275,8 @@ const hashear = (password, salt) => {
 };
 
 /*
-we’ll write our hash function, which will call the hasher function. We’ll perform all our validations here, such as making
- sure the salt is a string, a plain password is provided, and both password and salt are provided in the parameter.
+Creamos la función hash, que llamará a la función hasheadora. Aquí ser haran las validaciones para segurarnos que la sal
+es un string y que la contraseña es texto plano. Ambas se pasan en el parámetro
 */
 
 const hash = (password, salt) => {
@@ -310,13 +290,10 @@ const hash = (password, salt) => {
 };
 
 /*
-compare password function. This will actually use the same algorithm to hash the password entered and then test whether
-the new hash matches the stored hash.
-s in the inputted password and a hash as a parameter. For testing purposes, we’ll use the salt and hashed password that
- we got to test the compare password function.
-
-We’ll write some validation to check whether the password or hash is provided and also whether the type of password is a
- string and type of hash is an object, which contains the salt value and the hashed password.
+Función para comprar las contraseñas. Usa el algorimo de hashear y luego comprueba si machea con el hash guardado en base de datos.
+El input es la contraseña como parámetro y el hash.
+ This will actually use the same algorithm to hash the password entered and then test whether
+Se hacen algunas validaciones para asegurarnos que tenemos todo
 
 */
 const comparar = (password, hash) => {
