@@ -202,12 +202,11 @@ app.post('/api/articulos/nuevoArticulo', async (req, res) => {
 app.post('/api/borrarPost', async (req, res) => {
 
     //Recogemos el valor del cuerpo de la request y lo asginamos el primero a la constante username y el segundo a text
-    const {nombreArticulo} = req.body;
+    const {nombre} = req.body;
     //Recogemos el nombre del artículo de la request, los parámetros y el nombre (:name)
-
     withDB(async (db) => {
         //Buscarmos el usuario para ver si existe
-        const articulo = await db.collection('articulos').deleteOne(nombreArticulo);
+        const articulo = await db.collection('articulos').deleteOne({"nombre": nombre});
         if (!articulo) {
             return res.status(400).json({
                 type: "Error",
@@ -372,9 +371,9 @@ app.post('/api/login', async (req, res) => {
 app.post('/api/borrarUsuario', async (req, res) => {
 
     //Recogemos el valor del cuerpo de la request y lo asginamos el primero a la constante username y el segundo a text
-    console.log(req.body);
+
     const {email} = req.body;
-    console.log(email)
+
     //Recogemos el nombre del artículo de la request, los parámetros y el nombre (:name)
 
     withDB(async (db) => {
