@@ -90,6 +90,29 @@ app.get('/api/obtenerArticulos', async (req, res) => {
 
 });
 
+
+//Devolver los 5 artículos más recientes creados
+app.get('/api/obtenerArticulosReducido', async (req, res) => {
+
+    //Llamamos a la función de la base de datos y tenemos como parámetro la propia base de datos y la operación que
+    // queremos realizar
+    await withDB(async (db) => {
+        const arrayAux = [];
+        //Buscamos en al base de datos el artículo que tenga ese nombre
+        let cursor = await db.collection('articulos').find().limit(4).sort({fechaCreacion: -1});
+        while (await cursor.hasNext()) {
+            const articulo = await cursor.next();
+            arrayAux.push(articulo);
+        }
+
+        //Le asignas el número del estado al constuir la respuesta.
+        await res.status(200).json(arrayAux);
+    }, res);
+
+
+});
+
+
 //API ENDPOINT OBTENER TODOS LOS USUARIOS
 app.get('/api/obtenenerTodosUsuarios', async (req, res) => {
 
